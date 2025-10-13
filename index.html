@@ -145,7 +145,11 @@
             --color-text-medium: #374151;
             --color-text-light: #6b7280;
             --color-text-muted: #9ca3af;
-            
+            /* Add Job Modal - Higher Z-index to appear above admin panel */
+#addJobModal {
+    z-index: 10000 !important;
+}
+
             /* Background Colors */
             --color-background: #ffffff;
             --color-background-light: #f8fafc;
@@ -3078,9 +3082,10 @@
         }
 
         // Job Management Functions
-        function showAddJobForm() {
-            document.getElementById('addJobModal').style.display = 'block';
-        }
+        function showAddJobModal() {
+    document.getElementById('addJobModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
 
         function hideAddJobModal() {
             document.getElementById('addJobModal').style.display = 'none';
