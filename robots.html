@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robots.txt - CareerSeekersIndia Consultancy</title>
+</head>
+<body>
+    <h1>robots.txt Content</h1>
+    <p>Copy this content and save it as <strong>robots.txt</strong> in your website's root directory:</p>
+    
+    <pre><code>User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://careerseekersindia.netlify.app/sitemap.xml
+
+# Crawl-delay for better server performance
+Crawl-delay: 1
+
+# Allow all search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Disallow admin or sensitive areas if any
+# User-agent: *
+# Disallow: /admin/
+# Disallow: /private/
+
+# Allow access to important pages
+Allow: /#services
+Allow: /#jobs
+Allow: /#all-jobs
+Allow: /#about
+Allow: /#contact</code></pre>
+</body>
+</html>
