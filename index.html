@@ -1975,6 +1975,7 @@
                 <li><a href="#jobs" class="nav-link">Jobs</a></li>
                 <li><a href="#all-jobs" class="nav-link">All Jobs</a></li>
                 <li><a href="#about" class="nav-link" onclick="showAboutPage(event)">About Us</a></li>
+                <li><a href="#community" class="nav-link" onclick="showCommunityPage(event)">Our Community</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
                 <li><button class="btn btn--primary" onclick="showAdminPanel()">Admin</button></li>
             </ul>
@@ -2494,8 +2495,118 @@
             </div>
         </div>
     </div>
+</div>
+</div>
 
-    <!-- Admin Panel -->
+<!-- Community Page -->
+<div class="about-page" id="communityPage" style="display: none;">
+    <div class="about-hero">
+        <div class="container">
+            <div class="about-hero-content">
+                <button class="back-btn" onclick="showHomePage()">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </button>
+                <h1 class="about-title">Our Community</h1>
+                <p class="about-subtitle">Connect, Share, and Grow Together</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="about-content">
+            <section class="about-section">
+                <div class="section-header">
+                    <h2><i class="fab fa-whatsapp"></i> WhatsApp Community</h2>
+                </div>
+                <div class="about-text">
+                    <p>Our WhatsApp community is the best place to get instant job updates, news alerts, and connect with fellow job seekers. We share exclusive opportunities and daily career resources. Click the WhatsApp button to join!</p>
+                    
+                    <div class="mission-cta" style="margin-top: var(--spacing-xl); text-align: center;">
+                        <button class="btn btn--primary btn--lg" onclick="showWhatsAppModal()">
+                            <i class="fab fa-whatsapp"></i> Join Us
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- WhatsApp Confirmation Modal -->
+<div class="modal" id="whatsappModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fab fa-whatsapp"></i> Join WhatsApp Community</h3>
+            <button class="modal-close" onclick="hideWhatsAppModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>This is WhatsApp community for job openings, latest updates and news. Would you like to join?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn--primary" onclick="proceedToWhatsApp()">Proceed</button>
+            <button class="btn btn--outline" onclick="hideWhatsAppModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Application Modal -->
+<div class="modal" id="applicationModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-paper-plane"></i> Apply for Job</h3>
+            <button class="modal-close" onclick="hideApplicationModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="submitApplication(event)" id="applicationForm">
+                <input type="hidden" id="applicationJobId" name="jobId">
+                <input type="hidden" id="applicationJobTitle" name="jobTitle">
+                <input type="hidden" id="applicationCategory" name="category">
+                
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" name="phone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-input form-textarea" name="address" rows="2" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Experience</label>
+                    <input type="text" class="form-input" name="experience" placeholder="e.g., 2 years" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Qualification</label>
+                    <input type="text" class="form-input" name="qualification" placeholder="e.g., B.Tech, MBA" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Resume (PDF only)</label>
+                    <input type="file" class="form-input" name="resume" accept=".pdf" required>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" form="applicationForm" class="btn btn--primary">Submit Application</button>
+            <button type="button" class="btn btn--outline" onclick="hideApplicationModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Admin Panel -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
         <div class="admin-content">
             <div class="admin-header">
@@ -2530,7 +2641,7 @@
                 <div class="admin-tab-content" id="jobsTab">
                     <div class="admin-section-header">
                         <h3>Manage Jobs by Category</h3>
-                        <button class="btn btn--primary" onclick="showAddJobForm()">Add New Job</button>
+                        <button class="btn btn--primary" onclick="showAddJobModal()">Add New Job</button>
                     </div>
                     <div class="job-list" id="jobList">
                         <!-- Jobs will be populated here -->
@@ -2560,71 +2671,6 @@
                         <!-- Applications will be populated here -->
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Job Application Modal -->
-    <div class="modal" id="applicationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Apply for Job</h3>
-                <button class="modal-close" onclick="hideApplicationModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form onsubmit="submitApplication(event)" id="applicationForm">
-                    <div class="form-group">
-                        <label class="form-label">Full Name *</label>
-                        <input type="text" class="form-input" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Email Address *</label>
-                        <input type="email" class="form-input" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Phone Number *</label>
-                        <input type="tel" class="form-input" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Address *</label>
-                        <textarea class="form-input form-textarea" name="address" rows="3" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Years of Experience *</label>
-                        <select class="form-select" name="experience" required>
-                            <option value="">Select Experience</option>
-                            <option value="0-1 years">0-1 years</option>
-                            <option value="1-3 years">1-3 years</option>
-                            <option value="3-5 years">3-5 years</option>
-                            <option value="5-10 years">5-10 years</option>
-                            <option value="10+ years">10+ years</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Highest Qualification *</label>
-                        <select class="form-select" name="qualification" required>
-                            <option value="">Select Qualification</option>
-                            <option value="10th Pass">10th Pass</option>
-                            <option value="12th Pass">12th Pass</option>
-                            <option value="Diploma">Diploma</option>
-                            <option value="Bachelor's Degree">Bachelor's Degree</option>
-                            <option value="Master's Degree">Master's Degree</option>
-                            <option value="PhD">PhD</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Upload Resume/CV</label>
-                        <input type="file" class="form-input" name="resume" accept=".pdf,.doc,.docx">
-                        <small>Upload your resume (PDF, DOC, or DOCX format)</small>
-                    </div>
-                    <input type="hidden" name="jobId" id="applicationJobId">
-                    <input type="hidden" name="jobTitle" id="applicationJobTitle">
-                    <input type="hidden" name="category" id="applicationCategory">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" form="applicationForm" class="btn btn--primary">Submit Application</button>
-                <button type="button" class="btn btn--outline" onclick="hideApplicationModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -3268,14 +3314,52 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function showHomePage() {
-            document.getElementById('homePage').style.display = 'block';
-            document.getElementById('aboutPage').style.display = 'none';
-            currentPage = 'home';
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        // Community Page Functions
+function showCommunityPage(event) {
+    if (event) event.preventDefault();
+    document.getElementById('homePage').style.display = 'none';
+    document.getElementById('aboutPage').style.display = 'none';
+    document.getElementById('communityPage').style.display = 'block';
+    currentPage = 'community';
+    
+    // Close mobile menu if open
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+    hamburger.classList.remove('active');
+    navMenu.classList.remove('active');
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
+// WhatsApp Modal Functions
+function showWhatsAppModal() {
+    document.getElementById('whatsappModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function hideWhatsAppModal() {
+    document.getElementById('whatsappModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function proceedToWhatsApp() {
+    // Hide modal first
+    hideWhatsAppModal();
+    
+    // Open WhatsApp community link
+    window.open('https://chat.whatsapp.com/FoO00icUFqu7p5tiLhZmKK?mode=wwt', '_blank');
+}
+
+
+       function showHomePage() {
+    document.getElementById('homePage').style.display = 'block';
+    document.getElementById('aboutPage').style.display = 'none';
+    document.getElementById('communityPage').style.display = 'none';  // Add this line
+    currentPage = 'home';
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
         // Smooth scrolling
         function scrollToSection(sectionId) {
             if (currentPage !== 'home') {
@@ -3318,17 +3402,17 @@
 
         // Close modals when clicking outside
         window.addEventListener('click', (e) => {
-            const modals = ['adminPanel', 'applicationModal', 'addJobModal'];
+            const modals = ['adminPanel', 'applicationModal', 'addJobModal', 'whatsappModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (e.target === modal) {
                     if (modalId === 'adminPanel') {
                         hideAdminPanel();
-                    } else if (modalId === 'applicationModal') {
-                        hideApplicationModal();
                     } else if (modalId === 'addJobModal') {
-                        hideAddJobModal();
-                    }
+    hideAddJobModal();
+} else if (modalId === 'whatsappModal') {
+    hideWhatsAppModal();
+}
                 }
             });
         });
