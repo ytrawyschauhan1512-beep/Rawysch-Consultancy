@@ -433,7 +433,7 @@
             right: 0;
             bottom: 0;
             z-index: 1;
-            background-color: rgba(30, 64, 175, 0.75);,./
+            background-color: rgba(30, 64, 175, 0.75);
         }
 
         .floating-shapes {
@@ -3097,32 +3097,65 @@
             document.getElementById('addJobForm').reset();
         }
 
-        function addJob(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const jobData = Object.fromEntries(formData);
-            
-            const newJob = {
-                id: 'job_' + Date.now(),
-                title: jobData.title,
-                category: jobData.category,
-                salary: jobData.salary,
-                location: jobData.location,
-                experience: jobData.experience,
-                jobUrl: jobData.jobUrl,
-                description: jobData.description,
-                dateAdded: new Date().toISOString()
-            };
-            
-            jobs.push(newJob);
-            saveData();
-            renderCategories();
-            renderAllJobs();
-            populateLocationFilter();
-            loadJobsForAdmin();
-            hideAddJobModal();
-            alert('Job added successfully!');
+        async function addJob(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const jobData = Object.fromEntries(formData);
+    
+    // Prepare data for Supabase
+    const jobPayload = {
+        title: jobData.title,
+        type: jobData.category,
+        location: jobData.location,
+        category: jobData.category,
+        company_name: jobData.company_name || 'Not Specified',
+        salary: jobData.salary,
+        description: jobData.description || '',
+        experience: jobData.experience,
+        job_url: jobData.jobUrl || null
+    };
+    
+    try {
+        // Insert into Supabase
+        const { data, error } = await supabaseClient
+            .from('jobs')
+            .insert([jobPayload])
+            .select();
+        
+        if (error) {
+            console.error('Supabase error:', error);
+            alert('❌ Error posting job: ' + error.message);
+            return;
         }
+        
+        // Success - update local state
+        const newJob = {
+            id: data[0].id.toString(),
+            title: jobData.title,
+            category: jobData.category,
+            salary: jobData.salary,
+            location: jobData.location,
+            experience: jobData.experience,
+            jobUrl: jobData.jobUrl,
+            description: jobData.description,
+            dateAdded: data[0].created_at || new Date().toISOString()
+        };
+        
+        jobs.push(newJob);
+        saveData();
+        renderCategories();
+        renderAllJobs();
+        populateLocationFilter();
+        loadJobsForAdmin();
+        hideAddJobModal();
+        alert('✅ Job posted successfully!');
+        event.target.reset();
+        
+    } catch (err) {
+        console.error('Unexpected error:', err);
+        alert('❌ An unexpected error occurred. Please try again.');
+    }
+}
 
         function loadJobsForAdmin() {
             const jobList = document.getElementById('jobList');
@@ -3449,5 +3482,12 @@ function proceedToWhatsApp() {
             );
         }
     </script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+  const { createClient } = supabase;
+  const supabaseUrl = "https://xrddrisjwcfpacxawogk.supabase.co";      
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhyZGRyaXNqd2NmcGFjeGF3b2drIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2ODA3ODIsImV4cCI6MjA3NjI1Njc4Mn0.hJ_1U1XpWDu71qp2VCKk1GTYxHpsqnBeMnx9K7o1KT0"; 
+  const supabaseClient = createClient(supabaseUrl, supabaseKey);
+</script>
 </body>
 </html>
