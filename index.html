@@ -3066,6 +3066,7 @@
                 document.getElementById('adminLogin').style.display = 'none';
                 document.getElementById('adminDashboard').style.display = 'block';
                 loadJobsForAdmin();
+                loadApplicationsFromSupabase();
                 loadApplicationsForAdmin();
                 document.getElementById('adminUsername').value = '';
                 document.getElementById('adminPassword').value = '';
@@ -3245,42 +3246,121 @@
             currentJobId = null;
         }
 
-        function submitApplication(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const applicationData = Object.fromEntries(formData);
-            
-            // Handle file upload
-            const resumeFile = formData.get('resume');
-            let resumeInfo = null;
-            if (resumeFile && resumeFile.size > 0) {
-                resumeInfo = {
-                    name: resumeFile.name,
-                    size: resumeFile.size,
-                    type: resumeFile.type
-                };
-            }
-            
-            const newApplication = {
-                id: 'app_' + Date.now(),
-                jobId: applicationData.jobId,
-                jobTitle: applicationData.jobTitle,
-                category: applicationData.category,
-                name: applicationData.name,
-                email: applicationData.email,
-                phone: applicationData.phone,
-                address: applicationData.address,
-                experience: applicationData.experience,
-                qualification: applicationData.qualification,
-                resume: resumeInfo,
-                dateApplied: new Date().toISOString()
-            };
-            
-            applications.push(newApplication);
-            saveData();
-            hideApplicationModal();
-            alert('Application submitted successfully! We will contact you soon.');
+        async function submitApplication(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const applicationData = Object.fromEntries(formData);
+    
+    // Handle file upload info
+    const resumeFile = formData.get('resume');
+    let resumeInfo = {
+        name: null,
+        size: null,
+        type: null
+    };
+    
+    if (resumeFile && resumeFile.size > 0) {
+        resumeInfo = {
+            name: resumeFile.name,
+            size: resumeFile.size,
+            type: resumeFile.type
+        };
+    }
+    
+    // Prepare payload for Supabase
+    const applicationPayload = {
+        job_id: applicationData.jobId,
+        job_title: applicationData.jobTitle,
+        category: applicationData.category,
+        name: applicationData.name,
+        email: applicationData.email,
+        phone: applicationData.phone,
+        address: applicationData.address,
+        experience: applicationData.experience,
+        qualification: applicationData.qualification,
+        resume_name: resumeInfo.name,
+        resume_size: resumeInfo.size,
+        resume_type: resumeInfo.type
+    };
+    
+    try {
+        // Insert into Supabase
+        const { data, error } = await supabaseClient
+            .from('applications')
+            .insert([applicationPayload])
+            .select();
+        
+        if (error) {
+            console.error('Supabase error:', error);
+            alert('❌ Error submitting application: ' + error.message);
+            return;
         }
+        
+        // Success - add to local array for immediate UI update
+        const newApplication = {
+            id: data.id.toString(),
+            jobId: applicationData.jobId,
+            jobTitle: applicationData.jobTitle,
+            category: applicationData.category,
+            name: applicationData.name,
+            email: applicationData.email,
+            phone: applicationData.phone,
+            address: applicationData.address,
+            experience: applicationData.experience,
+            qualification: applicationData.qualification,
+            resume: resumeInfo.name ? resumeInfo : null,
+            dateApplied: data.created_at || new Date().toISOString()
+        };
+        
+        applications.push(newApplication);
+        saveData();
+        hideApplicationModal();
+        alert('✅ Application submitted successfully! We will contact you soon.');
+        
+    } catch (err) {
+        console.error('Unexpected error:', err);
+        alert('❌ An unexpected error occurred. Please try again.');
+    }
+}
+async function loadApplicationsFromSupabase() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('applications')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('Error loading applications:', error);
+            // Fall back to localStorage
+            return;
+        }
+        
+        // Transform Supabase data to match local format
+        applications = data.map(app => ({
+            id: app.id.toString(),
+            jobId: app.job_id,
+            jobTitle: app.job_title,
+            category: app.category,
+            name: app.name,
+            email: app.email,
+            phone: app.phone,
+            address: app.address,
+            experience: app.experience,
+            qualification: app.qualification,
+            resume: app.resume_name ? {
+                name: app.resume_name,
+                size: app.resume_size,
+                type: app.resume_type
+            } : null,
+            dateApplied: app.created_at
+        }));
+        
+        saveData(); // Sync to localStorage
+        
+    } catch (err) {
+        console.error('Unexpected error loading applications:', err);
+    }
+}
 
         function loadApplicationsForAdmin() {
             const applicationsList = document.getElementById('applicationsList');
