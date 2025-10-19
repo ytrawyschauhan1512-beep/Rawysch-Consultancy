@@ -3148,14 +3148,14 @@
         renderAllJobs();
         populateLocationFilter();
         loadJobsForAdmin();
-        hideAddJobModal();
+        hideJobModal();
         alert('✅ Job posted successfully!');
         event.target.reset();
         
     } catch (err) {
-    console.error('Caught exception in addJob():', err);
-    alert('❌ An unexpected error occurred. Check console for details.');
-  }
+        console.error('Unexpected error:', err);
+        alert('❌ An unexpected error occurred. Please try again.');
+    }
 }
 
         function loadJobsForAdmin() {
