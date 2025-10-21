@@ -2698,6 +2698,10 @@
                             <label class="form-label">Job Title *</label>
                             <input type="text" class="form-input" name="title" required>
                         </div>
+                <div class="form-group">
+                    <label class="form-label">Company Name *</label>
+                    <input type="text" class="form-input" name="company_name" placeholder="e.g., Amazon, Google" required>
+                </div>
                         <div class="form-group">
                             <label class="form-label">Category *</label>
                             <select class="form-select" name="category" required>
@@ -2767,6 +2771,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
             loadStoredData();
+            loadJobsFromSupabase(); // Load jobs from Supabase database
             renderCategories();
             renderAllJobs();
             populateLocationFilter();
@@ -2780,6 +2785,48 @@
         }
 
         // Load data from localStorage
+        
+        // Load jobs from Supabase on page load
+        async function loadJobsFromSupabase() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('jobs')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Error loading jobs from Supabase:', error);
+                    return; // Fall back to localStorage
+                }
+
+                if (data && data.length > 0) {
+                    console.log(`✅ Loaded ${data.length} jobs from Supabase`);
+
+                    // Transform Supabase data to match local format
+                    jobs = data.map(job => ({
+                        id: job.id.toString(),
+                        title: job.title,
+                        category: job.category,
+                        salary: job.salary,
+                        location: job.location,
+                        experience: job.experience,
+                        jobUrl: job.job_url,
+                        description: job.description || '',
+                        company_name: job.company_name || 'Not Specified',
+                        dateAdded: job.created_at
+                    }));
+
+                    saveData(); // Sync to localStorage
+                    renderCategories();
+                    renderAllJobs();
+                    populateLocationFilter();
+                }
+            } catch (err) {
+                console.error('Unexpected error loading jobs:', err);
+                // Fall back to localStorage data
+            }
+        }
+
         function loadStoredData() {
             const storedJobs = localStorage.getItem('careerSeekersJobs');
             const storedApplications = localStorage.getItem('careerSeekersApplications');
@@ -3148,7 +3195,7 @@
         renderAllJobs();
         populateLocationFilter();
         loadJobsForAdmin();
-        hideJobModal();
+        hideAddJobModal();
         alert('✅ Job posted successfully!');
         event.target.reset();
         
